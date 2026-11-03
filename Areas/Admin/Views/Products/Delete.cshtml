@@ -6,12 +6,13 @@
 }
 
 <h2>Xóa sản phẩm</h2>
-
 <h3>Bạn có chắc muốn xóa không?</h3>
-@Html.Partial("Partial_DaleteDatailsProducts", Model);
-<div>
-    <p>
-        @Html.ActionLink("Xóa", "Delete", new { id = Model.ProductID }, new { @class = "btn btn-primary" })
-        @Html.ActionLink("Quay về danh sách", "Index", null, new { @class = "btn btn-primary" })
-    </p>
-</div>
+
+@Html.Partial("Partial_DeleteDetailsProduct", Model)
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <input type="submit" value="Xóa" class="btn btn-danger" />
+    @Html.ActionLink("Quay về danh sách", "Index", null, new { @class = "btn btn-primary" })
+}
