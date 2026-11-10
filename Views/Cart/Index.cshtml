@@ -1,0 +1,87 @@
+﻿@model _25DH230146_MyStore.Models.ViewModel.Cart
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+<div class="container shoppingcart" style="padding: 20px;">
+    <h2>GIỎ HÀNG</h2>
+
+    @if (Model.Items == null || !Model.Items.Any())
+    {
+        <p>Bạn chưa có sản phẩm nào trong giỏ.</p>
+        <p>@Html.ActionLink("Tiếp tục mua sắm", "Index", "Home", null,
+          new { @class = "btn btn-warning" })</p>
+    }
+    else
+    {
+        <div class="row">
+            <!-- Chi tiết danh sách sản phẩm trong giỏ -->
+            <div class="col-md-8 cart-section">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                            <th>
+                                <a href="@Url.Action("ClearCart", "Cart")" title="Xóa tất cả mặt hàng">
+                                    <i class="fas fa-trash" style="color:red;"></i>
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <img src="@item.ProductImage" alt="@item.ProductName"
+                                         style="max-height:80px;" />
+                                    <br />
+                                    <strong>@item.ProductName</strong>
+                                </td>
+                                <td>
+                                    @using (Html.BeginForm("UpdateQuantity", "Cart", FormMethod.Post))
+                                    {
+                                        <input type="hidden" name="id" value="@item.ProductID" />
+                                        <input type="number" name="quantity" value="@item.Quantity"
+                                               min="1" max="100" style="width: 60px;" />
+                                        <button type="submit" class="btn btn-sm btn-default">
+                                    Cập nhật
+                                        </button>
+                                    }
+                                </td>
+                                <td>@item.UnitPrice.ToString("N0") VNĐ</td>
+                                <td>@item.TotalPrice.ToString("N0") VNĐ</td>
+                                <td>
+                                    <a href="@Url.Action("RemoveFromCart", "Cart", 
+                                            new { id = item.ProductID })">
+                                        <i class="fas fa-times" style="color:red;"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Khối tổng tiền và thanh toán -->
+            <div class="col-md-4 cart-section" style="background-color: #f9f9f9; padding: 20px;
+border-radius: 5px;">
+                <h4><strong>Tổng giá trị:</strong> <span style="color: red;">
+                    @Model.TotalValue().ToString("N0") VNĐ</span></h4>
+                <p>
+                    @Html.ActionLink("Mua hàng (Checkout)", "Checkout", "Order",
+                   null, new { @class = "btn btn-danger btn-block", 
+                       style = "width:100%; margin-top:10px;" })
+                </p>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            @Html.ActionLink("Tiếp tục mua sắm", "Index", "Home", 
+           null, new { @class = "btn btn-warning" })
+        </div>
+    }
+</div>

@@ -23,26 +23,30 @@ namespace _25DH230146_MyStore.Areas.Admin.Controllers
         {
             var model = new ProductSearchVM();
             var products = db.Products.AsQueryable();
+
             // Tìm kiếm sản phẩm dựa trên từ khóa
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 model.SearchTerm = searchTerm;
                 products = products.Where(p => p.ProductName.Contains(searchTerm) ||
-                                              p.ProductDescription.Contains(searchTerm) ||
-                                              p.Category.CategoryName.Contains(searchTerm));
+                            p.ProductDescription.Contains(searchTerm) ||
+                            p.Category.CategoryName.Contains(searchTerm));
             }
+
             // Tìm kiếm sản phẩm dựa trên giá tối thiểu
             if (minPrice.HasValue)
             {
                 model.MinPrice = minPrice.Value;
                 products = products.Where(p => p.ProductPrice >= minPrice.Value);
             }
+
             // Tìm kiếm sản phẩm dựa trên giá tối đa
             if (maxPrice.HasValue)
             {
                 model.MaxPrice = maxPrice.Value;
                 products = products.Where(p => p.ProductPrice <= maxPrice.Value);
             }
+
             // Áp dụng sắp xếp dựa trên lựa chọn của người dùng
             switch (sortOrder)
             {
