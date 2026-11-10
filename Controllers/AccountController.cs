@@ -53,7 +53,24 @@ namespace _25DH230146_MyStore.Controllers
                 };
                 db.Customers.Add(customer);
 
-                db.SaveChanges();
+                try
+                {
+                    db.SaveChanges();
+                    return RedirectToAction("Index", "Home");
+                }
+                catch (System.Data.Entity.Validation.DbEntityValidationException dbEx)
+                {
+                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                    {
+                        foreach (var validationError in validationErrors.ValidationErrors)
+                        {
+                            // Hiển thị cả tên cột và nội dung lỗi ra màn hình
+                            ModelState.AddModelError("", $"{validationError.PropertyName}: {validationError.ErrorMessage}");
+                        }
+                    }
+                    return View(model);
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             return View(model);

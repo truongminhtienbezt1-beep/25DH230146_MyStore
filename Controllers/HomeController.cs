@@ -44,7 +44,7 @@ namespace _25DH230146_MyStore.Controllers
         }
 
         // GET: Home/ProductDetails/5
-        public ActionResult ProductDetails(int? id, int? quantity, int? page)
+        public ActionResult ProductDetail(int? id, int? quantity, int? page)
         {
             if (id == null)
             {

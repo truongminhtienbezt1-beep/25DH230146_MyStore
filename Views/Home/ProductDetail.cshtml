@@ -1,6 +1,6 @@
 ﻿@model _25DH230146_MyStore.Models.ViewModel.ProductDetailsVM
 @{
-    ViewBag.Title = "ProductDetails";
+    ViewBag.Title = "ProductDetail";
     Layout = "~/Views/Shared/_CustomerLayout.cshtml";
 }
 <div class="container-fluid pro" style="padding: 20px;">
@@ -27,7 +27,7 @@
         <!-- Khối bên phải: Chọn số lượng, tạm tính và nút Thêm vào giỏ -->
         <div class="col-md-4 pro-section" style="flex: 1; border-left: 1px solid #ddd;
 padding-left: 20px;">
-            @using (Html.BeginForm("ProductDetails", "Home", FormMethod.Get))
+            @using (Html.BeginForm("ProductDetail", "Home", FormMethod.Get))
             {
                 <h4><strong>Số lượng</strong></h4>
                 <p>

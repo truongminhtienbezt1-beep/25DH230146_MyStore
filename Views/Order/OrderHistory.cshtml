@@ -1,0 +1,53 @@
+﻿@model IEnumerable<_25DH230146_MyStore.Models.Order>
+@{
+    ViewBag.Title = "Lịch sử mua hàng";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+}
+<div class="container" style="padding: 20px;">
+    <h2>Lịch sử mua hàng</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <p>Bạn chưa có đơn hàng nào.</p>
+    }
+    else
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã đơn hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái thanh toán</th>
+                    <th>Phương thức thanh toán</th>
+                    <th>Phương thức giao hàng</th>
+                    <th>Địa chỉ giao hàng</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.OrderID</td>
+                        <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td style="color: red; font-weight: bold;">
+                        @item.TotalAmount.ToString("N0") VNĐ</td>
+                        <td>@item.PaymentStatus</td>
+                        <td>@item.PaymentMethod</td>
+                        <td>@item.DeliveryMethod</td>
+                        <td>@item.ShippingAddress</td>
+                        <td>
+                            @Html.ActionLink("Chi tiết", "OrderSuccess",
+                           new { id = item.OrderID }, new { @class = "btn btn-sm btn-info" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <p style="margin-top: 20px;">
+        @Html.ActionLink("Về trang chủ", "Index", "Home", null, new { @class = "btn btn-warning" })
+    </p>
+</div>
