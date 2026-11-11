@@ -5,35 +5,56 @@
 @if (Model.NewProducts != null && Model.NewProducts.Any())
 {
     <section class="container-fluid listProduct">
-        <h2>Sản phẩm mới</h2>
-        <ul class="list-container">
+        <h2 class="mb-4 text-center">Sản phẩm mới</h2>
+
+        <!-- Thay thẻ ul thành div.row để dàn lưới Bootstrap -->
+        <div class="row list-container">
             @foreach (var product in Model.NewProducts)
             {
-                <li class="lproduct-item">
-                    <div>
-                        <a href="@Url.Action("ProductDetail", "Home", new { id = product.ProductID })">
-                            <img src="@Html.DisplayFor(modelItem => product.ProductImage)"
-                                 alt="@product.ProductName" />
-                        </a>
+                <!-- Thay thẻ li thành div cột (4 sản phẩm/hàng trên màn hình lớn) -->
+                <div class="col-md-3 col-sm-6 mb-4 lproduct-item">
+                    <div class="card h-100 text-center" style="border: 1px solid #eee; padding: 15px; border-radius: 8px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+
+                        <!-- Hình ảnh sản phẩm cố định chiều cao -->
+                        <div class="img-container" style="height: 250px; overflow: hidden; display: flex; align-items: center;
+justify-content: center;">
+                            <a href="@Url.Action("ProductDetail", "Home", new { id = product.ProductID })">
+                                <img src="@Html.DisplayFor(modelItem => product.ProductImage)"
+                                     class="img-fluid"
+                                     style="max-height: 100%; max-width: 100%; object-fit: contain;"
+                                     alt="@product.ProductName" />
+                            </a>
+                        </div>
+
+                        <!-- Thông tin chi tiết sản phẩm -->
+                        <div class="card-body" style="padding-top: 15px;">
+                            <h5 class="prodName" style="font-weight: bold; font-size: 1.1em; margin-bottom: 10px; height: 40px;
+overflow: hidden;">
+                                @Html.DisplayFor(modelItem => product.ProductName)
+                            </h5>
+                            <p class="prodPrice text-danger" style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">
+                                @product.ProductPrice.ToString("N0") VNĐ
+                            </p>
+                            <p class="prodSale text-muted" style="margin-bottom: 0; font-size: 0.9em;">
+                                Đã bán: @product.OrderDetails.Count
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="prodPrice">@Html.DisplayFor(modelItem => product.ProductPrice)</p>
-                        <p class="prodName">@Html.DisplayFor(modelItem => product.ProductName)</p>
-                        <p class="prodSale">Đã bán: &nbsp; @Html.DisplayFor(modelItem =>
-                                                      product.OrderDetails.Count)</p>
-                    </div>
-                </li>
+                </div>
             }
-        </ul>
+        </div>
     </section>
 
     <!-- Hiển thị phân trang cho sản phẩm mới -->
     <div class="pagination-container" style="text-align: center; margin-top: 20px;">
         @Html.PagedListPager(Model.NewProducts, page =>
-   Url.Action("Index", new { page, searchTerm = Model.SearchTerm }))
+       Url.Action("Index", new { page, searchTerm = Model.SearchTerm }))
     </div>
 }
 else
 {
-    <p>Không tìm được sản phẩm nào phù hợp.</p>
+    <div class="container text-center mt-5">
+        <p class="text-danger" style="font-size: 1.2em;">Không tìm được sản phẩm nào phù hợp.</p>
+    </div>
 }
