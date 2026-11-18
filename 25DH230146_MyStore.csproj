@@ -189,12 +189,15 @@
     <Compile Include="Models\ViewModel\CartItem.cs" />
     <Compile Include="Models\ViewModel\CartService.cs" />
     <Compile Include="Models\ViewModel\CheckoutVM.cs" />
+    <Compile Include="Models\ViewModel\DashboardViewModel.cs" />
     <Compile Include="Models\ViewModel\HomeProductVM.cs" />
     <Compile Include="Models\ViewModel\LoginVM.cs" />
+    <Compile Include="Models\ViewModel\MyOrderVM.cs" />
     <Compile Include="Models\ViewModel\PersonalMenuVM.cs" />
     <Compile Include="Models\ViewModel\ProductDetailsVM.cs" />
     <Compile Include="Models\ViewModel\ProductSearchVM.cs" />
     <Compile Include="Models\ViewModel\RegisterVM.cs" />
+    <Compile Include="Models\ViewModel\StatisticsVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -243,7 +246,6 @@
     </Content>
     <Content Include="Areas\Admin\Views\web.config" />
     <Content Include="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
-    <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Categories\Create.cshtml" />
     <Content Include="Areas\Admin\Views\Categories\Delete.cshtml" />
     <Content Include="Areas\Admin\Views\Categories\Details.cshtml" />
@@ -273,6 +275,7 @@
     <Content Include="Areas\Admin\Views\Users\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -310,6 +313,7 @@
     <Content Include="Views\Order\Checkout.cshtml" />
     <Content Include="Views\Order\OrderSuccess.cshtml" />
     <Content Include="Views\Order\OrderHistory.cshtml" />
+    <Content Include="Views\Order\MyOrder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

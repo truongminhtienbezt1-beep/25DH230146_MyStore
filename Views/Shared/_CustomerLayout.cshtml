@@ -1,15 +1,15 @@
 ﻿@{
-    // Lấy thông tin giỏ hàng từ Session[cite: 3]
+    // Lấy thông tin giỏ hàng từ Session
     var cart = Session["Cart"] as _25DH230146_MyStore.Models.ViewModel.Cart;
 
-    // Tạo đối tượng ViewBag.pmmodel dạng PersonalMenuVM để quản lý menu cá nhân[cite: 3]
+    // Tạo đối tượng ViewBag.pmmodel dạng PersonalMenuVM để quản lý menu cá nhân
     ViewBag.pmmodel = new _25DH230146_MyStore.Models.ViewModel.PersonalMenuVM
     {
         IsLoggedIn = User.Identity.IsAuthenticated,
         Username = User.Identity.IsAuthenticated ? User.Identity.Name : string.Empty
     };
 
-    // Nếu giỏ hàng có sản phẩm thì gán tổng số lượng mặt hàng vào CartCount[cite: 3]
+    // Nếu giỏ hàng có sản phẩm thì gán tổng số lượng mặt hàng vào CartCount
     if (cart != null && cart.Items.Any())
     {
         ViewBag.pmmodel.CartCount = cart.Items.Count();
@@ -22,7 +22,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My Store</title>
-    <!-- Nhúng các file CSS, Bootstrap và FontAwesome nếu cần -->
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -100,7 +99,7 @@
                             @if (ViewBag.pmmodel.IsLoggedIn)
                             {
                                 <a href="@Url.Action("Profile", "Account")">Thông tin tài khoản</a>
-                                <a href="@Url.Action("OrderHistory", "Order")">Lịch sử mua hàng</a>
+                                <a href="@Url.Action("MyOrder", "Order")">Lịch sử mua hàng</a>
                                 <a href="@Url.Action("Logout", "Account")">Đăng xuất</a>
                             }
                             else

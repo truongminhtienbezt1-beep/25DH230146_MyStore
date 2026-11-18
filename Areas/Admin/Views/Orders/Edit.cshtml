@@ -1,86 +1,53 @@
 ﻿@model _25DH230146_MyStore.Models.Order
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Cập nhật trạng thái đơn hàng";
     Layout = "~/Views/Shared/_CustomerLayout.cshtml";
 }
 
-<h2>Edit</h2>
+<div class="container-fluid" style="padding: 20px;">
+    <h2>CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG #@Model.OrderID</h2>
+    <hr />
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Order</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.OrderID)
+    @using (Html.BeginForm("Edit", "Orders", FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.OrderID)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.CustomerID, "CustomerID", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("CustomerID", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.CustomerID, "", new { @class = "text-danger" })
+            <label class="control-label col-md-2">Khách hàng</label>
+            <div class="col-md-6">
+                <p class="form-control-static"><strong>@Model.Customer.CustomerName</strong></p>
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.OrderDate, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.OrderDate, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.OrderDate, "", new { @class = "text-danger" })
+            <label class="control-label col-md-2">Tổng tiền</label>
+            <div class="col-md-6">
+                <p class="form-control-static text-danger"><strong>@Model.TotalAmount.ToString("N0") VNĐ</strong></p>
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.TotalAmount, "", new { @class = "text-danger" })
+            <label class="control-label col-md-2">Trạng thái mới</label>
+            <div class="col-md-4">
+                <select name="PaymentStatus" class="form-control">
+                    <option value="Chưa thanh toán" @(Model.PaymentStatus == "Chưa thanh toán" ? "selected" : "")>Chưa thanh toán</option>
+                    <option value="Chờ thanh toán" @(Model.PaymentStatus == "Chờ thanh toán" ? "selected" : "")>Chờ thanh toán</option>
+                    <option value="Thanh toán tiền mặt" @(Model.PaymentStatus == "Thanh toán tiền mặt" ? "selected" : "")>Thanh toán tiền mặt</option>
+                    <option value="Đang xử lý" @(Model.PaymentStatus == "Đang xử lý" ? "selected" : "")>Đang xử lý</option>
+                    <option value="Đang vận chuyển" @(Model.PaymentStatus == "Đang vận chuyển" ? "selected" : "")>Đang vận chuyển</option>
+                    <option value="Đã giao" @(Model.PaymentStatus == "Đã giao" ? "selected" : "")>Đã giao</option>
+                    <option value="Đã hủy" @(Model.PaymentStatus == "Đã hủy" ? "selected" : "")>Đã hủy</option>
+                </select>
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.PaymentStatus, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.PaymentStatus, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.PaymentStatus, "", new { @class = "text-danger" })
+            <div class="col-md-offset-2 col-md-6" style="margin-top: 15px;">
+                <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                @Html.ActionLink("Hủy", "Details", new { id = Model.OrderID }, new { @class = "btn btn-default" })
             </div>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ShippingAddress, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.ShippingAddress, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.ShippingAddress, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.DeliveryMethod, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DeliveryMethod, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.DeliveryMethod, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.PaymentMethod, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.PaymentMethod, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.PaymentMethod, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </div>
-    </div>
-}
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
+    }
 </div>

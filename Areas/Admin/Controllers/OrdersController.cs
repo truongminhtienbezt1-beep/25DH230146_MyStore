@@ -1,4 +1,6 @@
-﻿using System;
+﻿using _25DH230146_MyStore.Models;
+using PagedList;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
@@ -6,7 +8,6 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using _25DH230146_MyStore.Models;
 
 namespace _25DH230146_MyStore.Areas.Admin.Controllers
 {
@@ -15,10 +16,28 @@ namespace _25DH230146_MyStore.Areas.Admin.Controllers
         private MyStoreEntities db = new MyStoreEntities();
 
         // GET: Admin/Orders
-        public ActionResult Index()
+        public ActionResult Index(string customerName, string paymentStatus, DateTime? orderDate, int? page)
         {
-            var orders = db.Orders.Include(o => o.Customer);
-            return View(orders.ToList());
+            var orders = db.Orders.Include(o => o.Customer).AsQueryable();
+            if (!string.IsNullOrEmpty(customerName))
+            {
+                orders = orders.Where(o => o.Customer.CustomerName.Contains(customerName));
+            }
+            if (!string.IsNullOrEmpty(paymentStatus))
+            {
+                orders = orders.Where(o => o.PaymentStatus == paymentStatus);
+            }
+            if (orderDate.HasValue)
+            {
+                orders = orders.Where(o => DbFunctions.TruncateTime(o.OrderDate) == DbFunctions.TruncateTime(orderDate.Value));
+            }
+            ViewBag.CustomerName = customerName;
+            ViewBag.PaymentStatus = paymentStatus;
+            ViewBag.OrderDate = orderDate.HasValue ? orderDate.Value.ToString("yyyy-MM-dd") : "";
+            int pageNumber = page ?? 1;
+            int pageSize = 15;
+            var pagedOrders = orders.OrderByDescending(o => o.OrderDate).ToPagedList(pageNumber, pageSize);
+            return View(pagedOrders);
         }
 
         // GET: Admin/Orders/Details/5
@@ -28,7 +47,12 @@ namespace _25DH230146_MyStore.Areas.Admin.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Order order = db.Orders.Find(id);
+
+            var order = db.Orders
+                          .Include(o => o.Customer)
+                          .Include(o => o.OrderDetails.Select(od => od.Product))
+                          .SingleOrDefault(o => o.OrderID == id);
+
             if (order == null)
             {
                 return HttpNotFound();
@@ -64,17 +88,7 @@ namespace _25DH230146_MyStore.Areas.Admin.Controllers
         // GET: Admin/Orders/Edit/5
         public ActionResult Edit(int? id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Order order = db.Orders.Find(id);
-            if (order == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "CustomerName", order.CustomerID);
-            return View(order);
+            return Details(id);
         }
 
         // POST: Admin/Orders/Edit/5
@@ -82,16 +96,18 @@ namespace _25DH230146_MyStore.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "OrderID,CustomerID,OrderDate,TotalAmount,PaymentStatus,ShippingAddress,DeliveryMethod,PaymentMethod")] Order order)
+        public ActionResult Edit(int OrderID, string PaymentStatus)
         {
-            if (ModelState.IsValid)
+            var order = db.Orders.Find(OrderID);
+            if (order == null)
             {
-                db.Entry(order).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                return HttpNotFound();
             }
-            ViewBag.CustomerID = new SelectList(db.Customers, "CustomerID", "CustomerName", order.CustomerID);
-            return View(order);
+
+            order.PaymentStatus = PaymentStatus;
+            db.SaveChanges();
+
+            return RedirectToAction("Details", new { id = OrderID });
         }
 
         // GET: Admin/Orders/Delete/5

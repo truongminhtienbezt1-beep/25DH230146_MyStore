@@ -1,0 +1,209 @@
+﻿@model _25DH230146_MyStore.Models.ViewModel.MyOrderVM
+@{
+    ViewBag.Title = "Đơn hàng của tôi";
+    Layout = "~/Views/Shared/_CustomerLayout.cshtml";
+    var tabs = new List<KeyValuePair<string, string>>
+{
+        new KeyValuePair<string, string>("All", "Tất cả đơn"),
+        new KeyValuePair<string, string>("Chờ thanh toán", "Chờ thanh toán"),
+        new KeyValuePair<string, string>("Đang xử lý", "Đang xử lý"),
+        new KeyValuePair<string, string>("Đang vận chuyển", "Đang vận chuyển"),
+        new KeyValuePair<string, string>("Đã giao", "Đã giao"),
+        new KeyValuePair<string, string>("Đã hủy", "Đã hủy")
+    };
+}
+<style>
+    .myorder-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 15px;
+        background: #f8f9fa;
+    }
+
+    .order-tabs {
+        background: #fff;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 15px;
+        display: flex;
+    }
+
+        .order-tabs li {
+            flex: 1;
+            text-align: center;
+        }
+
+            .order-tabs li a {
+                color: #555;
+                font-weight: 500;
+                border: none !important;
+                border-bottom: 3px solid transparent !important;
+                padding: 12px 5px;
+            }
+
+            .order-tabs li.active a {
+                color: #0d6efd !important;
+                border-bottom: 3px solid #0d6efd !important;
+                background: #fff !important;
+            }
+
+    .order-search-box {
+        background: #fff;
+        padding: 10px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .order-card {
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 6px;
+        padding: 15px 20px;
+        margin-bottom: 15px;
+    }
+
+    .order-card-header {
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-weight: 600;
+    }
+
+    .order-item-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed #eee;
+    }
+
+    .order-item-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .order-item-img {
+        width: 65px;
+        height: 80px;
+        object-fit: contain;
+        border: 1px solid #eee;
+        padding: 3px;
+    }
+
+    .order-card-footer {
+        padding-top: 12px;
+        text-align: right;
+    }
+
+    .order-total {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+        .order-total span {
+            color: #d9534f;
+            font-weight: bold;
+            font-size: 18px;
+        }
+</style>
+
+<div class="myorder-container">
+    <h3>Đơn hàng của tôi</h3>
+
+    <!-- 1. Thanh Tab phân loại trạng thái -->
+    <ul class="nav nav-tabs order-tabs">
+        @foreach (var t in tabs)
+        {
+            <li class="@(Model.CurrentTab == t.Key ? "active" : "")">
+                <a href="@Url.Action("MyOrder", "Order", new { tab = t.Key, searchTerm = Model.SearchTerm })">@t.Value</a>
+            </li>
+        }
+    </ul>
+
+    <!-- 2. Thanh tìm kiếm đơn hàng -->
+    <div class="order-search-box">
+        @using (Html.BeginForm("MyOrder", "Order", FormMethod.Get, new { @class = "input-group" }))
+        {
+            <input type="hidden" name="tab" value="@Model.CurrentTab" />
+            <input type="text" name="searchTerm" value="@Model.SearchTerm" class="form-control"
+                   placeholder="Tìm đơn hàng theo Mã đơn hàng hoặc Tên sản phẩm" />
+            <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit">Tìm đơn hàng</button>
+            </span>
+        }
+    </div>
+
+    <!-- 3. Danh sách đơn hàng -->
+    @if (Model.Orders == null || !Model.Orders.Any())
+    {
+        <div class="alert alert-info text-center" style="padding: 30px; background: #fff;">
+            <p style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">
+                BẠN CHƯA CÓ ĐƠN HÀNG NÀO. HÃY ĐẶT ĐƠN NGAY.
+            </p>
+            @Html.ActionLink("Đi tới trang chủ", "Index", "Home", null, new { @class = "btn btn-primary" })
+        </div>
+    }
+    else
+    {
+        // Gom nhóm đơn hàng theo trạng thái đơn
+        var groupedOrders = Model.Orders.GroupBy(o => o.PaymentStatus);
+
+        foreach (var group in groupedOrders)
+        {
+            // Mặc định hiện 2 đơn gần nhất; nếu bấm Xem thêm thì hiện tối đa 50 đơn gần nhất
+            int limit = (Model.ExpandedStatus == group.Key) ? 50 : 2;
+            var ordersToShow = group.Take(limit).ToList();
+
+            foreach (var order in ordersToShow)
+            {
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <span>Trạng thái: @order.PaymentStatus</span>
+                        <span>Mã đơn hàng: #@order.OrderID | Ngày đặt: @order.OrderDate.ToString("dd/MM/yyyy")</span>
+                    </div>
+
+                    @foreach (var detail in order.OrderDetails)
+                    {
+                        <div class="order-item-row">
+                            <div class="order-item-info">
+                                <img src="@detail.Product.ProductImage" alt="@detail.Product.ProductName" class="order-item-img" />
+                                <div>
+                                    <div style="font-weight: 600;">@detail.Product.ProductName</div>
+                                    <div class="text-muted">Số lượng: x@detail.Quantity</div>
+                                    <div style="margin-top: 6px;">
+                                        @Html.ActionLink("Mua lại", "AddToCart", "Cart", new { id = detail.ProductID, quantity = 1 }, new { @class = "btn btn-xs btn-primary" })
+                                        @Html.ActionLink("Xem chi tiết", "ProductDetail", "Home", new { id = detail.ProductID }, new { @class = "btn btn-xs btn-default" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="font-weight: bold;">
+                                @detail.UnitPrice.ToString("N0") đ
+                            </div>
+                        </div>
+                    }
+
+                    <div class="order-card-footer">
+                        <div class="order-total">
+                            Tổng tiền: <span>@order.TotalAmount.ToString("N0") đ</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            // Hiển thị link "Xem thêm" nếu trạng thái này có nhiều hơn 2 đơn và chưa bấm mở rộng
+            if (group.Count() > 2 && Model.ExpandedStatus != group.Key)
+            {
+                <div style="margin-bottom: 20px;">
+                    <a href="@Url.Action("MyOrder", "Order", new { tab = Model.CurrentTab, searchTerm = Model.SearchTerm, expandedStatus = group.Key })"
+                       class="btn btn-default btn-sm">
+                        Xem thêm (@(Math.Min(group.Count(), 50) - 2) đơn hàng khác thuộc trạng thái "@group.Key")
+                    </a>
+                </div>
+            }
+        }
+    }
+</div>

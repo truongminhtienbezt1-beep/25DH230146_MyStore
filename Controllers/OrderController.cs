@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using _25DH230146_MyStore.Models;
 using _25DH230146_MyStore.Models.ViewModel;
+using System.Data.Entity;
 
 namespace _25DH230146_MyStore.Controllers
 {
@@ -136,6 +137,51 @@ namespace _25DH230146_MyStore.Controllers
                                   .ToList();
 
             return View(orders);
+        }
+
+        // GET: Order/MyOrder
+        [Authorize]
+        public ActionResult MyOrder(string tab = "All", string searchTerm = "", string expandedStatus = "")
+        {
+            var user = db.Users.SingleOrDefault(u => u.Username == User.Identity.Name);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var customer = db.Customers.SingleOrDefault(c => c.Username == user.Username);
+            if (customer == null) return RedirectToAction("Login", "Account");
+
+            // Lấy toàn bộ đơn hàng của khách hàng kèm chi tiết sản phẩm
+            var query = db.Orders
+                          .Include(o => o.OrderDetails.Select(od => od.Product))
+                          .Where(o => o.CustomerID == customer.CustomerID)
+                          .AsQueryable();
+
+            // 1. Lọc theo Tab trạng thái (nếu không phải tab "Tất cả đơn")
+            if (!string.IsNullOrEmpty(tab) && tab != "All")
+            {
+                query = query.Where(o => o.PaymentStatus == tab);
+            }
+
+            // 2. Tìm kiếm theo Mã đơn hàng hoặc Tên sản phẩm
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                int orderId;
+                bool isNumeric = int.TryParse(searchTerm.Trim(), out orderId);
+
+                query = query.Where(o =>
+                    (isNumeric && o.OrderID == orderId) ||
+                    o.OrderDetails.Any(od => od.Product.ProductName.Contains(searchTerm.Trim()))
+                );
+            }
+
+            var model = new MyOrderVM
+            {
+                SearchTerm = searchTerm,
+                CurrentTab = string.IsNullOrEmpty(tab) ? "All" : tab,
+                ExpandedStatus = expandedStatus,
+                Orders = query.OrderByDescending(o => o.OrderDate).ToList()
+            };
+
+            return View(model);
         }
     }
 }

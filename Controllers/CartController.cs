@@ -25,16 +25,21 @@ namespace _25DH230146_MyStore.Controllers
             return View(cart);
         }
 
-        // Thêm sản phẩm vào giỏ
+        // GET: Cart/AddToCart
         public ActionResult AddToCart(int id, int quantity = 1)
         {
             var product = db.Products.Find(id);
             if (product != null)
             {
-                var cart = GetCartService().GetCart();
-                cart.AddItem(product.ProductID, product.ProductImage,
-                    product.ProductName, product.ProductPrice, quantity,
-                    product.Category.CategoryName);
+                var cartService = GetCartService();
+                cartService.GetCart().AddItem(
+                    product.ProductID,
+                    product.ProductImage,
+                    product.ProductName,
+                    product.ProductPrice,
+                    quantity,
+                    product.Category.CategoryName
+                );
             }
             return RedirectToAction("Index");
         }
