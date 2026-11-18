@@ -116,5 +116,44 @@ namespace _25DH230146_MyStore.Controllers
             FormsAuthentication.SignOut();
             return RedirectToAction("Index", "Home");
         }
+
+        // GET: Account/Profile
+        [Authorize]
+        public new ActionResult Profile()
+        {
+            var customer = db.Customers.SingleOrDefault(c => c.Username == User.Identity.Name);
+            if (customer == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return View(customer);
+        }
+
+        // POST: Account/Profile
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public new ActionResult Profile(Customer model)
+        {
+            var customer = db.Customers.SingleOrDefault(c => c.Username == User.Identity.Name);
+            if (customer == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (ModelState.IsValid)
+            {
+                customer.CustomerName = model.CustomerName;
+                customer.CustomerPhone = model.CustomerPhone;
+                customer.CustomerEmail = model.CustomerEmail;
+                customer.CustomerAddress = model.CustomerAddress;
+
+                db.SaveChanges();
+                ViewBag.SuccessMessage = "Cập nhật thông tin tài khoản thành công!";
+            }
+
+            return View(customer);
+        }
     }
 }
